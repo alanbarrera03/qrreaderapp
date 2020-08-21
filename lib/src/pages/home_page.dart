@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:barcode_scan/barcode_scan.dart';
+//import 'package:barcode_scan/barcode_scan.dart';
+
+import 'package:qrreaderapp/src/Bloc/scans_bloc.dart';
+import 'package:qrreaderapp/src/models/scan_models.dart';
 
 import 'package:qrreaderapp/src/pages/mapas_pages.dart';
 import 'package:qrreaderapp/src/pages/direcciones_page.dart';
@@ -10,6 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final scansBloc = new ScansBloc();
+
   int currentIndex = 0;
 
   @override
@@ -18,7 +23,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('QR Scanner'),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.delete_forever), onPressed: () {})
+          IconButton(
+            icon: Icon(Icons.delete_forever),
+            onPressed: scansBloc.borrarScanTODOS,
+          )
         ],
       ),
       body: Center(child: _callPage(currentIndex)),
@@ -35,15 +43,22 @@ class _HomePageState extends State<HomePage> {
   //geo:25.62993233293621,-100.29293611487277
 
   _scanQR() async {
-    dynamic futureString = '';
+    //dynamic futureString = '';
 
-    try {
-      futureString = await BarcodeScanner.scan();
-    } catch (e) {
-      futureString = e.toString();
+    //try {
+    //  futureString = await BarcodeScanner.scan();
+    //} catch (e) {
+    //  futureString = e.toString();
+    //}
+
+    //print('Future String: ${futureString.rawContent}');
+
+    String futureString = 'https://www.facebook.com/Alan.Eduardo.Perez.Barrera';
+
+    if (futureString != null) {
+      final scan = ScanModel(valor: futureString);
+      scansBloc.agregarScan(scan);
     }
-
-    print('Future String: ${futureString.rawContent}');
 
     /*_scanQR() async {
     String captura = '';

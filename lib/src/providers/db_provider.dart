@@ -1,9 +1,11 @@
 import 'dart:io';
+//import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:qrreaderapp/src/models/scan_models.dart';
+export 'package:qrreaderapp/src/models/scan_models.dart';
 
 class DBProvider {
   static Database _database;
@@ -49,7 +51,57 @@ class DBProvider {
 
   nuevoScan(ScanModel nuevoScan) async {
     final db = await database;
-    final res = db.insert('Scans', nuevoScan.toJson());
+    final res = await db.insert('Scans', nuevoScan.toJson());
+    return res;
+  }
+
+  // SELECT - obtener información
+
+  Future<ScanModel> getScanId(int id) async {
+    final db = await database;
+    final res = await db.query('Scans', where: 'id = ?', whereArgs: [id]);
+    return res.isNotEmpty ? ScanModel.fromJson(res.first) : null;
+  }
+
+  Future<List<ScanModel>> getTodosScans() async {
+    final db = await database;
+    final res = await db.query('Scans');
+    List<ScanModel> list =
+        res.isNotEmpty ? res.map((c) => ScanModel.fromJson(c)).toList() : [];
+
+    return list;
+  }
+
+  Future<List<ScanModel>> getPorTipos(String tipo) async {
+    final db = await database;
+    final res = await db.rawQuery("SELECT * FROM Scans WHERE tipo = '$tipo'");
+    List<ScanModel> list =
+        res.isNotEmpty ? res.map((c) => ScanModel.fromJson(c)).toList() : [];
+
+    return list;
+  }
+
+  //UPDATE
+
+  Future<int> updateScan(ScanModel nuevoScan) async {
+    final db = await database;
+    final res = await db.update('Scans', nuevoScan.toJson(),
+        where: 'id  = ?', whereArgs: [nuevoScan.id]);
+
+    return res;
+  }
+
+  // DELETE registros
+
+  Future<int> deleteScan(int id) async {
+    final db = await database;
+    final res = await db.delete('Scans', where: 'id = ?', whereArgs: [id]);
+    return res;
+  }
+
+  Future<int> deleteAll() async {
+    final db = await database;
+    final res = await db.rawDelete('DELETE FROM Scans');
     return res;
   }
 }
